@@ -1,0 +1,38 @@
+{
+ "StressMAE-multi + LR": {
+  "acc": 1.0,
+  "f1": 1.0,
+  "bacc": 1.0,
+  "bf1": 1.0
+ },
+ "StressMAE-multi + SVM": {
+  "acc": 0.9977876106194691,
+  "f1": 0.9969934353417771,
+  "bacc": 1.0,
+  "bf1": 1.0
+ },
+ "StressMAE-multi + kNN": {
+  "acc": 1.0,
+  "f1": 1.0,
+  "bacc": 1.0,
+  "bf1": 1.0
+ },
+ "StressMAE-multi + GB": {
+  "acc": 0.9911504424778761,
+  "f1": 0.9871442279094618,
+  "bacc": 0.995575221238938,
+  "bf1": 0.994923059642817
+ },
+ "StressMAE-multi + LS": {
+  "acc": 1.0,
+  "f1": 1.0,
+  "bacc": 1.0,
+  "bf1": 1.0
+ },
+ "StressMAE-multi + Ensemble": {
+  "acc": 1.0,
+  "f1": 1.0,
+  "bacc": 1.0,
+  "bf1": 1.0
+ }
+}

@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.venv/
+cache/
+*.pt
+*.npz
+results/log_*.txt
+!results/log_multi_pretrainA.txt
+!results/log_multi_pretrainB.txt
