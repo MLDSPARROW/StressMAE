@@ -53,7 +53,7 @@ rows = [("StressMAE (ours)", "StressMAE-multi", "consensus", "Ours"),
 
 def vals(model, var, key):
     if var == "raw":
-        S = R[model]["post"]; k = {"acc": "raw_acc", "f1": "raw_f1"}[key]
+        S = R[model]["post"]; k = {"acc": "raw_acc", "f1": "raw_f1", "bacc": "raw_bacc", "bf1": "raw_bf1"}[key]
         return np.array([S[s][k] for s in SUBJ])
     S = R[model][var]
     return np.array([S[s][key] for s in SUBJ])
@@ -63,14 +63,12 @@ lines = []
 for label, model, var, tag in rows:
     cells = []
     for key in ("acc", "f1", "bacc", "bf1"):
-        if var == "raw" and key in ("bacc", "bf1"):
-            cells.append("--"); continue
         v = vals(model, var, key)
         M(f"S{tag}{dict(acc='Acc', f1='F', bacc='Bacc', bf1='Bf')[key]}", f3(v.mean()))
         M(f"S{tag}{dict(acc='Acc', f1='F', bacc='Bacc', bf1='Bf')[key]}sd", f3(v.std(ddof=1)))
         cells.append(f"{v.mean():.3f} $\\pm$ {v.std(ddof=1):.3f}")
     if tag == "Ours":
-        ptxt = "--"
+        ptxt = ""
     elif var == "consensus":
         st = ST[model]; ptxt = f"{pfmt(st['p_holm'])} ({st['wins']}/15)"
         M(f"S{tag}P", pfmt(st["p_holm"])); M(f"S{tag}Wins", str(st["wins"]))
@@ -145,7 +143,7 @@ lr_head = [json.load(open(f))["StressMAE-multi + LR"] for f in sorted(glob.glob(
 M("NHeadLRThreeAcc", f3(np.mean([r["acc"] for r in lr_head]))); M("NHeadLRThreeF", f3(np.mean([r["f1"] for r in lr_head])))
 tab = r"""\begin{table}[H]
 \centering\addcolor
-\caption{\add{Same-person protocols (for comparison with the literature only; the person's own labelled data are used for training). StressMAE: frozen pre-trained encoder of the subject's group (pre-trained without that subject) with an ensemble of person-specific classifiers. Random 10-fold: stratified 10-fold cross-validation of the non-overlapping 5\,s windows of each subject. Chronological: first two thirds of each condition for training, last third for testing (as in Liu et al.~\cite{liu2021learning}). No temporal context is used, so every window is classified from its own 5\,s of signal. Mean over 15 subjects.}}
+\caption{\add{Same-person protocols (for comparison with the literature only; the person's own labelled data are used for training). StressMAE: frozen pre-trained encoder of the subject's group (pre-trained without that subject) with an ensemble of person-specific classifiers. Random 10-fold: stratified 10-fold cross-validation of the non-overlapping 5\,s windows of each subject. Chronological: first two thirds of each condition for training, last third for testing (as in Liu et al.~\cite{liu2021learning}). No temporal context is used: each window is classified from its own 5\,s of signal, but the embedding standardization and the label spreading use the unlabeled windows of the whole recording. Mean over 15 subjects.}}
 \label{tab:nonstrict}
 \resizebox{\linewidth}{!}{
 \begin{tabular}{lcccccc}
@@ -209,7 +207,11 @@ for s in SUBJ:
 mins, nlab = np.array(mins), np.array(nlab); pct = 100 * cls / cls.sum()
 M("RecMin", f"${mins.mean():.1f} \\pm {mins.std(ddof=1):.1f}$ ({mins.min():.1f}--{mins.max():.1f})")
 M("LabWin", f"${nlab.mean():.0f} \\pm {nlab.std(ddof=1):.0f}$ ({nlab.min()}--{nlab.max()})")
-M("ClassPct", f"{pct[0]:.1f}\\,\\% / {pct[1]:.1f}\\,\\% / {pct[2]:.1f}\\,\\%")
+# largest-remainder rounding to one decimal, so that the three percentages sum to exactly 100.0
+tenths = np.floor(pct * 10).astype(int)
+for j in np.argsort(-(pct * 10 - tenths))[: 1000 - tenths.sum()]:
+    tenths[j] += 1
+M("ClassPct", " / ".join(f"{t / 10:.1f}\\%" for t in tenths))
 M("LabWinTotal", f"{int(nlab.sum()):,}")
 
 with open(os.path.join(TAB, "v2_numbers.tex"), "w") as f:
