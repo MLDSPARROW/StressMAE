@@ -143,7 +143,7 @@ lr_head = [json.load(open(f))["StressMAE-multi + LR"] for f in sorted(glob.glob(
 M("NHeadLRThreeAcc", f3(np.mean([r["acc"] for r in lr_head]))); M("NHeadLRThreeF", f3(np.mean([r["f1"] for r in lr_head])))
 tab = r"""\begin{table}[H]
 \centering\addcolor
-\caption{\add{Same-person protocols (for comparison with the literature only; the person's own labelled data are used for training). StressMAE: frozen pre-trained encoder of the subject's group (pre-trained without that subject) with an ensemble of person-specific classifiers. Random 10-fold: stratified 10-fold cross-validation of the non-overlapping 5\,s windows of each subject. Chronological: first two thirds of each condition for training, last third for testing (as in Liu et al.~\cite{liu2021learning}). No temporal context is used: each window is classified from its own 5\,s of signal, but the embedding standardization and the label spreading use the unlabeled windows of the whole recording. Mean over 15 subjects.}}
+\caption{\add{Same-person protocols (for comparison with the literature only; the person's own labelled data are used for training). StressMAE: frozen pre-trained encoder of the subject's group (pre-trained without that subject) with an ensemble of person-specific classifiers. Random 10-fold: stratified 10-fold cross-validation of the non-overlapping 5\,s windows of each subject. Chronological: first two thirds of each condition for training, last third for testing (as in Liu et al.~\cite{liu2021learning}). No temporal decoding is used, but the embedding standardization and the label spreading use the unlabeled windows of the whole recording. Mean over 15 subjects.}}
 \label{tab:nonstrict}
 \resizebox{\linewidth}{!}{
 \begin{tabular}{lcccccc}
